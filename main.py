@@ -1,18 +1,18 @@
-from pyomo.environ import *
-import numpy as np
-import pandas as pd
+#from pyomo.environ import *
+#import numpy as np
+#import pandas as pd
 import query_utils
-from pathlib import Path
+#from pathlib import Path
 import argparse
 import yaml
 from datetime import datetime, timezone
-from datetime import timedelta
+#from datetime import timedelta
 import Util
 from logger import setup_logger
 from debug import debug_model
 
 # create parser
-parser = argparse.ArgumentParser(description="Run dsxos-app-template with config file")
+parser = argparse.ArgumentParser(description="Run dsxos-app-test with config file")
 parser.add_argument("-c", "--config", required=True, help="Path to config YAML file")
 args = parser.parse_args() # Read arguments
 with open(args.config, "r") as f: # Open and read config-file
@@ -28,14 +28,17 @@ query_utils.init(api_url, api_headers)
 logger = setup_logger(
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
-    loki_tags={"app_name": "dsxos-app-template"},        # add more tags if needed
+    loki_tags={"app_name": "dsxos-app-test"},        # add more tags if needed
     level="INFO"
 )
 
-logger.info("dsxos-app-template start")
+logger.info("dsxos-app-test start")
 
 start_time = datetime.now(timezone.utc)
 
+logger.info(f'Hello world. The time is {start_time.strftime("%H:%M:%S %d-%m-%Y")}')
+
+"""
 ########################################################################
 # Read and validate input
 ########################################################################
@@ -238,8 +241,10 @@ results.write()
 # Debug the model to log infeasible constraints, variable values, and constraint statuses 
 # and save diagnostic output to a file
 debug_model(m)
+"""
 
 # Check that the solver completed successfully with an optimal or feasible result
+"""
 if (results.solver.status == SolverStatus.ok) and (
     (results.solver.termination_condition == TerminationCondition.optimal) 
     or (results.solver.termination_condition == TerminationCondition.feasible)
@@ -279,5 +284,5 @@ if (results.solver.status == SolverStatus.ok) and (
         
 else: 
     logger.error(f"Solver failed - empty result")
-
-logger.info("dsxos-app-template finished")
+"""
+logger.info("dsxos-app-test finished")
