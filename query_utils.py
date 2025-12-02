@@ -1,21 +1,23 @@
 from Query import Query
-import logging
+#import logging
 
 
-logger = logging.getLogger()
+#logger = logging.getLogger()
 
 _query_url = None
 _query_headers = None
 
-def init(url, headers):
-    global _query_url, _query_headers
+def init(url, headers, logger=None):
+    global _query_url, _query_headers, _logger
     _query_url = url
     _query_headers = headers
+    _logger = logger
+    
     logger.info(f"query_utils initialized with URL: {_query_url}")
     
 # Helper to create Query object
 def Q():
-    return Query(_query_url, headers=_query_headers)
+    return Query(_query_url, headers=_query_headers, logger=_logger)
     
 ###########################################################
 # GET
@@ -61,7 +63,7 @@ def get_last_prognosis_readings(dp_identifier):
         return last_prognosis_readings
 
     else:
-        logger.warning("No prognosis available for this datapoint.")
+        _logger.warning("No prognosis available for this datapoint.")
         return []
         
 # GET datapoint's last datapoint prognosis
@@ -73,10 +75,10 @@ def get_datapoint_prognosis(dp_identifier):
             .filter(Id__equals=last_prognosis_id)
             .get("/datapoint-prognoses")
         )
-        logger.info(f"datapoint_prognosis: {datapoint_prognosis}")
+        _logger.info(f"datapoint_prognosis: {datapoint_prognosis}")
         return datapoint_prognosis
     else:
-        logger.warning("No prognosis available for this datapoint.")
+        _logger.warning("No prognosis available for this datapoint.")
         return None
         
 ##########################################################        
