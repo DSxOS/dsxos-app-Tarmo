@@ -26,7 +26,7 @@ api_headers = {"Authorization": api_token}
 # Initialize query_utils with URL + headers    
 query_utils.init(api_url, api_headers)
 logger = setup_logger(
-    app_name="dsxos-app-test"
+    app_name="dsxos-app-test",
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
     #loki_tags={"app_name": "dsxos-app-test"},        # add more tags if needed
