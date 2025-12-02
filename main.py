@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import Util
 from logger import setup_logger
 
+
 # create parser
 parser = argparse.ArgumentParser(description="Run dsxos-app-test with config file")
 parser.add_argument("-c", "--config", required=False, help="Path to config YAML file", default="/app/config.yaml")
