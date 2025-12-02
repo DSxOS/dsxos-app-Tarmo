@@ -3,3 +3,4 @@ numpy
 pandas
 argparse
 pyomo
+requests

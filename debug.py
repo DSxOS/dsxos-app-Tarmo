@@ -1,6 +1,5 @@
 from pyomo.environ import Var, Constraint, value
 from pyomo.util.infeasible import log_infeasible_constraints
-import sys
 import io
 import logging
 
