@@ -1,15 +1,15 @@
 #from pyomo.environ import *
 #import numpy as np
 #import pandas as pd
-import query_utils
 #from pathlib import Path
+#from datetime import timedelta
+import query_utils
 import argparse
 import yaml
 from datetime import datetime, timezone
-#from datetime import timedelta
 import Util
 from logger import setup_logger
-from debug import debug_model
+#from debug import debug_model
 
 # create parser
 parser = argparse.ArgumentParser(description="Run dsxos-app-test with config file")
@@ -26,9 +26,10 @@ api_headers = {"Authorization": api_token}
 # Initialize query_utils with URL + headers    
 query_utils.init(api_url, api_headers)
 logger = setup_logger(
+    app_name="dsxos-app-test"
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
-    loki_tags={"app_name": "dsxos-app-test"},        # add more tags if needed
+    #loki_tags={"app_name": "dsxos-app-test"},        # add more tags if needed
     level="INFO"
 )
 
