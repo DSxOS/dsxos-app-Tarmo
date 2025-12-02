@@ -19,10 +19,10 @@ api_headers = {"Authorization": api_token}
 
 # Initialize logger with central logging to Loki
 logger = setup_logger(
-    app_name="dsxos-app-test",
+    #app_name="dsxos-app-test",
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
-    #loki_tags={"app_name": "dsxos-app-test"},        # add more tags if needed
+    loki_tags={"app_name": "dsxos-app-test"},        # add more tags if needed
     level="INFO"
 )
 
