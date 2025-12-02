@@ -1,5 +1,4 @@
 import requests
-import logging
 
 class Query:
     def __init__(self, base_url, headers=None, timeout=10, logger=None):
@@ -7,7 +6,7 @@ class Query:
         self.headers = headers or {}
         self.params = {}
         self.timeout = timeout
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger 
 
     def post(self, endpoint, data=None, json=None):
         return self._request("POST", endpoint, data=data, json=json)
