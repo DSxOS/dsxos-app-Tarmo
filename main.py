@@ -30,6 +30,9 @@ logger = setup_logger(
 # Initialize query_utils with URL + headers    
 query_utils.init(api_url, api_headers, logger)
 
+# Parsed arguments 
+logger.info("Parsed args: config=%s", args.config,)
+
 # Hello wolrld application
 logger.info("dsxos-app-test start")
 
