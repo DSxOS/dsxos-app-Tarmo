@@ -29,6 +29,16 @@ def get_datapoint(dp_identifier):
     )
     return dp_data
 
+# GET datapoint ID
+def get_datapoint_ID(dp_identifier):
+    dp_data = (
+        Q()
+        .filter(identifier__equals=dp_identifier)
+        .paginate(page=0, size=1)
+        .get("/datapoints")
+    )
+    return dp_data[0]["id"]
+
 # Get datapoint last reading by identifier
 def get_last_reading(dp_identifier):
     dp_data = get_datapoint(dp_identifier)
@@ -97,3 +107,8 @@ def post_datapoint_prognosis(prognosis_payload):
     
     return response
 
+# POST datapoint reading
+def post_datapoint_reading(datapoint_reading_payload):    
+    response = (Q().post("/readings", json=datapoint_reading_payload))
+    
+    return response

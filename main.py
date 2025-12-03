@@ -40,4 +40,12 @@ start_time = datetime.now(timezone.utc)
 testDP_read_val = query_utils.get_last_reading_value(raw_data["params"]["testDP_read_ID"])
 logger.info(f'The last reading value for datapoint "{raw_data["params"]["testDP_read_ID"]}" at time {start_time.strftime("%H:%M:%S %d-%m-%Y")} is {testDP_read_val}')
 
+current_second = start_time.second
+testDP_readonly_val = current_second
+testDP_readonly_payload = {
+    "datapointId": query_utils.get_datapoint_ID(raw_data["params"]["testDP_read_only_ID"]),
+    "value": testDP_readonly_val
+}
+logger.info(f"Response for Datapoint reading POST: {query_utils.post_datapoint_reading(testDP_readonly_payload)}")
+
 logger.info("dsxos-app-test finished")
