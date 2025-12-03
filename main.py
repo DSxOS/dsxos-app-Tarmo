@@ -37,6 +37,7 @@ logger.info("Passed arguments: %s", raw_data)
 logger.info("dsxos-app-test start")
 
 start_time = datetime.now(timezone.utc)
-logger.info(f'Hello world. The time is {start_time.strftime("%H:%M:%S %d-%m-%Y")}')
+testDP_read_val = query_utils.get_last_reading_value(raw_data["params"]["testDP_read_ID"])
+logger.info(f'The last reading value for datapoint "{raw_data["params"]["testDP_read_ID"]}" at time {start_time.strftime("%H:%M:%S %d-%m-%Y")} is {testDP_read_val}')
 
 logger.info("dsxos-app-test finished")
