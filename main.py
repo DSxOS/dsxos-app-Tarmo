@@ -55,7 +55,7 @@ schedule = ess_scheduling.generate_schedule(
                     query_utils.get_last_prognosis_readings('consumption_p_lt'), 
                     query_utils.get_last_prognosis_readings('elering_nps_price'), 
                     query_utils.get_last_reading_value('elering_nps_price'), 
-                    query_utils.get_last_prognosis_readings('ess_e_lt'), 
+                    None, #query_utils.get_last_prognosis_readings('ess_e_lt'), 
                     query_utils.get_last_reading_value('ess_p') ,
                     query_utils.get_last_reading_value('ess_charge'),
                     query_utils.get_last_reading_value('ess_avg_SOC'),
