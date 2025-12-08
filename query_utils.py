@@ -57,6 +57,36 @@ def get_last_reading_value(dp_identifier):
     last_reading_value = get_last_reading(dp_identifier)
     return last_reading_value[0].get("value")
 
+# Get datapoint last control command by identifier
+def get_last_control(dp_identifier):
+    dp_data = get_datapoint(dp_identifier)
+    dp_id = dp_data[0]["id"]
+    last_control_val = (
+        Q()
+        .filter(datapointId__equals=dp_id)
+        .order_by("time", "desc")
+        .paginate(page=0, size=1)
+        .get("/control-values")
+    )
+    return last_control_val
+
+# Get datapoint last control command value by identifier
+def get_last_control_value(dp_identifier):
+    last_control_value = get_last_control(dp_identifier)
+    return last_control_value[0].get("value")
+
+# Get datapoint last control command status by identifier
+def get_last_control_status(dp_identifier):
+    last_reading_value = get_last_control(dp_identifier)
+    return last_reading_value[0].get("sent")
+
+# Get datapoint last control command value and status by identifier
+def get_last_control_value_and_status(dp_identifier):
+    last_reading_value = get_last_control(dp_identifier)
+    return {
+        "value" : last_reading_value[0].get("value"), 
+        "sent" : last_reading_value[0].get("sent")}
+
 # GET datapoint last prognosis readings data
 def get_last_prognosis_readings(dp_identifier):
     last_prognosis_id = get_datapoint(dp_identifier)[0].get("lastPrognosisId")
@@ -110,5 +140,17 @@ def post_datapoint_prognosis(prognosis_payload):
 # POST datapoint reading
 def post_datapoint_reading(datapoint_reading_payload):    
     response = (Q().post("/readings", json=datapoint_reading_payload))
+    
+    return response
+
+# POST datapoint control value
+def post_datapoint_ctrl_value(datapoint_ctrl_val_payload):    
+    response = (Q().post("/control-values", json=datapoint_ctrl_val_payload))
+    
+    return response
+
+# POST set datapoint control value status to sent
+def post_datapoint_ctrl_status_sent(ctrl_status_sent_payload):    
+    response = (Q().post("/control-values/set-sent", json=ctrl_status_sent_payload))
     
     return response
