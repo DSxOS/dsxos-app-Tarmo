@@ -54,7 +54,7 @@ try:
                         lastConsumptionPrognosis = query_utils.get_last_prognosis_readings(raw_data["params"]['consumption_p_lt_DP_ID']), 
                         lastNpSpotPricePrognosis = query_utils.get_last_prognosis_readings(raw_data["params"]['elering_nps_price_DP_ID']), 
                         npSpotCurrentPrice = query_utils.get_last_reading_value(raw_data["params"]['elering_nps_price_DP_ID']), 
-                        lastEss_e_lt = query_utils.get_last_prognosis_readings(raw_data["params"]['ess_e_lt_DP_ID'], generate_if_missing=False), 
+                        lastEss_e_lt = query_utils.get_last_prognosis_readings(raw_data["params"]['ess_e_lt_DP_ID'], generate_if_missing=True), 
                         ess_p = query_utils.get_last_reading_value(raw_data["params"]['ess_p_DP_ID']) ,
                         ess_charge = query_utils.get_last_reading_value(raw_data["params"]['ess_charge_DP_ID']),
                         ess_charge_end = query_utils.get_last_reading_value(raw_data["params"]['ess_charge_end_DP_ID']),
