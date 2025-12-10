@@ -1,4 +1,5 @@
 from Query import Query
+import Util
 
 _query_url = None
 _query_headers = None
@@ -88,7 +89,7 @@ def get_last_control_value_and_status(dp_identifier):
         "sent" : last_reading_value[0].get("sent")}
 
 # GET datapoint last prognosis readings data
-def get_last_prognosis_readings(dp_identifier):
+def get_last_prognosis_readings(dp_identifier, generate_if_missing=False):
     last_prognosis_id = get_datapoint(dp_identifier)[0].get("lastPrognosisId")
     if last_prognosis_id is not None:
         last_prognosis_readings = (
@@ -96,11 +97,14 @@ def get_last_prognosis_readings(dp_identifier):
             .filter(datapointPrognosisId__equals=last_prognosis_id)
             .get("/prognosis-readings")
         )
-        return last_prognosis_readings
-
-    else:
+    else:              
         _logger.warning("No prognosis available for this datapoint.")
-        return []
+        if generate_if_missing:
+            last_prognosis_readings = Util.generate_prognosis_entries() 
+        else:
+            last_prognosis_readings = []
+    
+    return last_prognosis_readings    
         
 # GET datapoint's last datapoint prognosis
 def get_datapoint_prognosis(dp_identifier):

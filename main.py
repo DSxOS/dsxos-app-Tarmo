@@ -3,7 +3,6 @@ import argparse
 import yaml
 from datetime import datetime, timezone, timedelta
 import pytz
-import Util
 import ess_scheduling
 from logger import setup_logger
 
@@ -55,7 +54,7 @@ try:
                         lastConsumptionPrognosis = query_utils.get_last_prognosis_readings(raw_data["params"]['consumption_p_lt_DP_ID']), 
                         lastNpSpotPricePrognosis = query_utils.get_last_prognosis_readings(raw_data["params"]['elering_nps_price_DP_ID']), 
                         npSpotCurrentPrice = query_utils.get_last_reading_value(raw_data["params"]['elering_nps_price_DP_ID']), 
-                        lastEss_e_lt = query_utils.get_last_prognosis_readings(raw_data["params"]['ess_e_lt_DP_ID']), 
+                        lastEss_e_lt = query_utils.get_last_prognosis_readings(raw_data["params"]['ess_e_lt_DP_ID'], generate_if_missing=False), 
                         ess_p = query_utils.get_last_reading_value(raw_data["params"]['ess_p_DP_ID']) ,
                         ess_charge = query_utils.get_last_reading_value(raw_data["params"]['ess_charge_DP_ID']),
                         ess_charge_end = query_utils.get_last_reading_value(raw_data["params"]['ess_charge_end_DP_ID']),

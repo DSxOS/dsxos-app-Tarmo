@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Union
 import math
+import random
 
 class TaskFailException(Exception):
     """Exception for use in forecast validation."""
@@ -161,3 +162,24 @@ def find_common_time_range(series_list: List[List[Dict[str, str]]]) -> Dict[str,
     
 def extract_values_only(series: List[Dict[str, Union[datetime, float]]]) -> List[float]:
     return [entry["value"] for entry in series]
+
+def generate_prognosis_entries(
+    count=135,
+    start_time=datetime.now(timezone.utc),
+    interval_minutes=15
+    ):
+    
+    prognosis_id = random.randint(1, 300_000)
+
+    entries = []
+    for i in range(count):
+        entry_time = start_time + timedelta(minutes=i * interval_minutes)
+        entry = {
+            'id': i + 1,
+            'time': entry_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            'value': 0,
+            'datapointPrognosisId': prognosis_id
+        }
+        entries.append(entry)
+
+    return entries
