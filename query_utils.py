@@ -98,7 +98,7 @@ def get_last_prognosis_readings(dp_identifier, generate_if_missing=False):
             .get("/prognosis-readings")
         )
     else:              
-        _logger.warning("No prognosis available for this datapoint.")
+        _logger.warning(f"No prognosis available for datapoint {dp_identifier}.")
         if generate_if_missing:
             last_prognosis_readings = Util.generate_prognosis_entries() 
         else:
@@ -118,7 +118,7 @@ def get_datapoint_prognosis(dp_identifier):
         _logger.info(f"datapoint_prognosis: {datapoint_prognosis}")
         return datapoint_prognosis
     else:
-        _logger.warning("No prognosis available for this datapoint.")
+        _logger.warning(f"No prognosis available for datapoint {dp_identifier}.")
         return None
         
 ##########################################################        
