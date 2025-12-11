@@ -156,10 +156,17 @@ def generate_schedule(lastProductionPrognosis,
         ESS_SOC_0 = {ESS_SOC_0} %\n\
         ESS_SOC_END = {ESS_SOC_END} %')
     
-    logger.debug(f'Production: {prod}')
-    logger.debug(f'Consumption: {cons}')
-    logger.debug(f'Spot price: {np}')
-    logger.debug(f'Tariff: {tf}')
+    prod_str = ", ".join(f"{x:.3f}" for x in prod)
+    logger.debug(f"Production values:\n[{prod_str}]")
+
+    cons_str = ", ".join(f"{x:.3f}" for x in cons)
+    logger.debug(f"Consumption values:\n[{cons_str}]")
+
+    np_str = ", ".join(f"{x:.2f}" for x in np)
+    logger.debug(f"Spot price:\n[{np_str}]")
+
+    tf_str = ", ".join(f"{x:.2f}" for x in tf)
+    logger.debug(f"Tariff:\n[{tf_str}]")
     ########################################################################
 
     ########################### Method for Converting Model Data to Pandas DataFrame #################################
