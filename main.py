@@ -25,7 +25,7 @@ logger = setup_logger(
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
     loki_tags={"app_name": APP_NAME},        # add more tags if needed
-    level=raw_data["logLevel"]
+    #level=raw_data["logLevel"]
 )
 
 # Initialize query_utils with URL + headers    
