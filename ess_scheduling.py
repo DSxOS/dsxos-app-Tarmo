@@ -64,7 +64,7 @@ def generate_schedule(lastProductionPrognosis,
     npSpotPricePrognosis = npSpotPricePrognosis.sort_index()
 
     # Log parameters
-    logger.info(f'Scheduling initialised with following parameters: n\
+    logger.info(f'Scheduling initialised with following parameters:\n\
         ESS P = {ess_p/1000} kW\n\
         ESS available charge = {ess_charge/1000} kWh\n\
         ESS charge at end time = {ess_charge_end/1000} kWh\n\
@@ -142,7 +142,7 @@ def generate_schedule(lastProductionPrognosis,
 
 
     ########################### debug info #################################
-    logger.info(f'ESS_kW = {ESS_kW} kW\n\
+    logger.debug(f'ESS_kW = {ESS_kW} kW\n\
         ESS_kWh = {ESS_kWh} kWh\n\
         ESS_max_kWh = {ESS_max_kWh} kWh\n\
         P_imp_lim_kW = {P_imp_lim_kW} kW\n\
@@ -317,13 +317,12 @@ def generate_schedule(lastProductionPrognosis,
 
         # Format results as data frame
         results_df = model_to_df(m)
+        logger.debug(f"Scheduling results: \n\
+                     {results_df}")
         logger.info(f'<<< INITIAL COST = {dataset["cost"].sum():.2f} for {dataset["pcc"].sum()*kW_to_kWh/1000:.2f} kWh grid electricity >>> VS <<< TOTAL COST={value(m.objective()):.2f} for {(imp_kW-exp_kW)*kW_to_kWh/1000:.2f} kWh grid electricity>>>')
-        load = results_df["ESS"].values
         
-        logger.info(",".join(f"{x:.4g}" for x in load))
-
+        return results_df["ESS"].values 
     else:    
-        results_df = None
         logger.info(results.write())
 
-    return results_df    
+        return None    
