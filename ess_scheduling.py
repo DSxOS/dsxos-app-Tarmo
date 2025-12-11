@@ -317,11 +317,13 @@ def generate_schedule(lastProductionPrognosis,
 
         # Format results as data frame
         results_df = model_to_df(m)
+        results_df["datetime"] = dataset.index
+
         logger.debug(f"Scheduling results: \n\
                      {results_df}")
         logger.info(f'<<< INITIAL COST = {dataset["cost"].sum():.2f} for {dataset["pcc"].sum()*kW_to_kWh/1000:.2f} kWh grid electricity >>> VS <<< TOTAL COST={value(m.objective()):.2f} for {(imp_kW-exp_kW)*kW_to_kWh/1000:.2f} kWh grid electricity>>>')
         
-        return results_df["ESS"].values 
+        return results_df[["datetime", "ESS"]] 
     else:    
         logger.info(results.write())
 

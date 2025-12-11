@@ -25,7 +25,7 @@ logger = setup_logger(
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
     loki_tags={"app_name": APP_NAME},        # add more tags if needed
-    level="INFO"
+    level=raw_data["logLevel"]
 )
 
 # Initialize query_utils with URL + headers    
@@ -60,9 +60,37 @@ try:
                         NIGHT_TARIFF = raw_data["params"]['NIGHT_TARIFF'], #0.05,
                         ESS_DEG_COST = raw_data["params"]['ESS_DEG_COST'], #0.139,
                         local_timezone = pytz.timezone(raw_data["params"]['timezone']),
-                        logger = logger)
-            
-    logger.info("ESS Schedule:" + ",".join(f"{x:.4g}" for x in schedule))
+                        logger = logger)            
+
+    if (len(schedule) == 0):
+        # Use old prognosis, if it exists
+        logger.warning(f"Optimization failed - empty result. Prognosis not updated.")
+        #essPowerPrognosisRaw = [r["value"] for r in query_utils.get_last_prognosis_readings(raw_data["params"]['ess_e_lt_DP_ID'])]
+    else:
+        #logger.info("ESS Schedule:" + ",".join(f"{x:.4g}" for x in schedule))
+        logger.info("ESS Schedule: "+", ".join(f"{dt} = {ess:.4g}" for dt, ess in zip(schedule["datetime"], schedule["ESS"])))
+
+        #essPowerPrognosisRaw = schedule * 1000
+        
+    # Create a list of prognosis readings with corresponding timestamps
+    essPowerPlan =[]
+    for dt, value in enumerate(schedule):
+        #reading_time = start_time + timedelta(seconds=i * interval)  
+        essPowerPlan.append({
+            "time": dt,
+            "value": value
+        })
+
+    # Construct the prognosis payload with datapoint ID, timestamp, and planned ESS power readings
+    prognosis_payload = {
+        "datapointId": raw_data["params"]['ess_e_lt_DP_ID'],
+        "time": datetime.now().isoformat().replace('+00:00', 'Z'),
+        "readings":essPowerPlan
+    }
+    
+    # POST datapoint prognosis and prognosis readings
+    response = query_utils.post_datapoint_prognosis(prognosis_payload)
+    logger.info(f"Posted prognosis for datapoint {raw_data["params"]['ess_e_lt_DP_ID']}; Response: {response}")
     
 except Exception as e:
     logger.error(f"Error generating ESS schedule: {e}")
