@@ -64,7 +64,7 @@ try:
 
     if (len(schedule) == 0):
         # Use old prognosis, if it exists
-        logger.warning(f"Optimization failed - empty result. Prognosis not updated.")
+        logger.warning(f'Optimization failed - empty result. Prognosis not updated.')
         #essPowerPrognosisRaw = [r["value"] for r in query_utils.get_last_prognosis_readings(raw_data["params"]['ess_e_lt_DP_ID'])]
     else:
         #logger.info("ESS Schedule:" + ",".join(f"{x:.4g}" for x in schedule))
@@ -90,9 +90,9 @@ try:
     
     # POST datapoint prognosis and prognosis readings
     response = query_utils.post_datapoint_prognosis(prognosis_payload)
-    logger.info(f"Posted prognosis for datapoint {raw_data["params"]['ess_e_lt_DP_ID']}; Response: {response}")
+    logger.info(f'Posted prognosis for datapoint {raw_data["params"]['ess_e_lt_DP_ID']}; Response: {response}')
     
 except Exception as e:
-    logger.error(f"Error generating ESS schedule: {e}")
+    logger.error(f'Error generating ESS schedule: {e}')
 
 logger.info("dsxos-app-test finished")
