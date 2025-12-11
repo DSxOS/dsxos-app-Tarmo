@@ -6,6 +6,9 @@ import pytz
 import ess_scheduling
 from logger import setup_logger
 
+#######################################################################
+#### INITIALIZATION
+#######################################################################
 APP_NAME = "dsxos-app-test"
 
 # create parser
@@ -34,6 +37,9 @@ query_utils.init(api_url, api_headers, logger)
 # Log passed arguments 
 logger.info(f"{APP_NAME} run with arguments: %s", raw_data)
 
+#######################################################################
+#### APPLICATION
+#######################################################################
 # Generate ESS schedule
 try:
     schedule = ess_scheduling.generate_schedule(
@@ -70,8 +76,10 @@ try:
 
     # Prepare prognosis payload data based on generated schedule
     essPowerPlan =[]
-    for dt, value in schedule: 
-        utc_dt = datetime.fromisoformat(dt).astimezone(timezone.utc) 
+    for _, row in schedule.iterrows():
+        dt = row['datetime']
+        utc_dt = dt.astimezone(timezone.utc) 
+        value = row['ESS'] 
         essPowerPlan.append({
             "time": utc_dt.isoformat().replace('+00:00', 'Z'),
             "value": value*1000
@@ -91,4 +99,7 @@ try:
 except Exception as e:
     logger.error(f'Error generating ESS schedule: {e}')
 
+#######################################################################
+#### FINALIZATION
+#######################################################################
 logger.info("dsxos-app-test finished")
