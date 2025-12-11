@@ -63,32 +63,28 @@ try:
                         logger = logger)            
 
     if (len(schedule) == 0):
-        # Use old prognosis, if it exists
+        # Handle empty schedule case
         logger.warning(f'Optimization failed - empty result. Prognosis not updated.')
-        #essPowerPrognosisRaw = [r["value"] for r in query_utils.get_last_prognosis_readings(raw_data['params']['ess_e_lt_DP_ID'])]
     else:
-        #logger.info("ESS Schedule:" + ",".join(f"{x:.4g}" for x in schedule))
         logger.info("ESS Schedule: "+", ".join(f"{dt} = {ess:.4g}" for dt, ess in zip(schedule["datetime"], schedule["ESS"])))
 
-        #essPowerPrognosisRaw = schedule * 1000
-        
-    # Create a list of prognosis readings with corresponding timestamps
+    # Prepare prognosis payload data based on generated schedule
     essPowerPlan =[]
-    for dt, value in enumerate(schedule):
-        #reading_time = start_time + timedelta(seconds=i * interval)  
+    for dt, value in schedule: 
+        utc_dt = datetime.fromisoformat(dt).astimezone(timezone.utc) 
         essPowerPlan.append({
-            "time": dt,
-            "value": value
+            "time": utc_dt.isoformat().replace('+00:00', 'Z'),
+            "value": value*1000
         })
 
-    # Construct the prognosis payload with datapoint ID, timestamp, and planned ESS power readings
+    # Construct the prognosis payload with datapoint ID, timestamp, and payload data
     prognosis_payload = {
-        "datapointId": raw_data['params']['ess_e_lt_DP_ID'],
-        "time": datetime.now().isoformat().replace('+00:00', 'Z'),
+        "datapointId": query_utils.get_datapoint_ID(raw_data['params']['ess_e_lt_DP_ID']),
+        "time": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
         "readings":essPowerPlan
     }
-    
-    # POST datapoint prognosis and prognosis readings
+
+    # POST datapoint prognosis
     response = query_utils.post_datapoint_prognosis(prognosis_payload)
     logger.info(f"Posted prognosis for datapoint {raw_data['params']['ess_e_lt_DP_ID']}; Response: {response}")
     
