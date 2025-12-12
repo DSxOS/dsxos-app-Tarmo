@@ -82,7 +82,7 @@ try:
         value = row['ESS'] 
         essPowerPlan.append({
             "time": utc_dt.isoformat().replace('+00:00', 'Z'),
-            "value": value*1000
+            "value": value
         })
 
     # Construct the prognosis payload with datapoint ID, timestamp, and payload data
