@@ -140,7 +140,6 @@ def generate_schedule(lastProductionPrognosis,
     ESS_SOC_END = ESS_END_kWh/ESS_eff_kWh*100
     ########################################################################
 
-
     ########################### debug info #################################
     logger.debug(f'ESS_kW = {ESS_kW} kW\n\
         ESS_kWh = {ESS_kWh} kWh\n\
