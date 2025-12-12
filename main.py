@@ -42,7 +42,7 @@ logger.info(f"{APP_NAME} run with arguments: %s", raw_data)
 #######################################################################
 # Generate ESS schedule
 #try:
-logger.info(f'Last consumption prognosis: {query_utils.get_last_prognosis_readings(raw_data['params']['consumption_p_lt_DP_ID'])}')
+logger.info(f"Last consumption prognosis: {query_utils.get_last_prognosis_readings(raw_data['params']['consumption_p_lt_DP_ID'])}")
 
 schedule = ess_scheduling.generate_schedule(
                     lastProductionPrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['production_p_lt_DP_ID']), 
