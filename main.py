@@ -41,63 +41,63 @@ logger.info(f"{APP_NAME} run with arguments: %s", raw_data)
 #### APPLICATION
 #######################################################################
 # Generate ESS schedule
-try:
-    schedule = ess_scheduling.generate_schedule(
-                        lastProductionPrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['production_p_lt_DP_ID']), 
-                        lastConsumptionPrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['consumption_p_lt_DP_ID']), 
-                        lastNpSpotPricePrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['elering_nps_price_DP_ID']), 
-                        npSpotCurrentPrice = query_utils.get_last_reading_value(raw_data['params']['elering_nps_price_DP_ID']), 
-                        lastEss_e_lt = query_utils.get_last_prognosis_readings(raw_data['params']['ess_e_lt_DP_ID'], generate_if_missing=True), 
-                        ess_p = query_utils.get_last_reading_value(raw_data['params']['ess_p_DP_ID']) ,
-                        ess_charge = query_utils.get_last_reading_value(raw_data['params']['ess_charge_DP_ID']),
-                        ess_charge_end = query_utils.get_last_reading_value(raw_data['params']['ess_charge_end_DP_ID']),
-                        ess_soc = query_utils.get_last_reading_value(raw_data['params']['ess_avg_SOC_DP_ID']),
-                        ess_max_p = query_utils.get_last_reading_value(raw_data['params']['ess_max_p_DP_ID']),
-                        ess_max_e = query_utils.get_last_reading_value(raw_data['params']['ess_max_e_DP_ID']),
-                        ess_soc_min = raw_data['params']['ess_soc_min'], 
-                        ess_soc_max = raw_data['params']['ess_soc_max'],
-                        ess_safe_min = query_utils.get_last_reading_value(raw_data['params']['ess_min_batt_safe_lim_DP_ID'])*100,
-                        pccImportLimitW = query_utils.get_last_reading_value(raw_data['params']['pccImportLimitW_DP_ID']), #100000,
-                        pccExportLimitW = query_utils.get_last_reading_value(raw_data['params']['pccExportLimitW_DP_ID']), #-100000,
-                        startTime = datetime.now(),
-                        endTime = datetime.now() + timedelta(seconds=86400), # +24h
-                        interval = raw_data['params']['interval'], #900, #15min
-                        DAY_TARIFF = raw_data['params']['DAY_TARIFF'], #0.07,
-                        NIGHT_TARIFF = raw_data['params']['NIGHT_TARIFF'], #0.05,
-                        ESS_DEG_COST = raw_data['params']['ESS_DEG_COST'], #0.139,
-                        local_timezone = pytz.timezone(raw_data['params']['timezone']),
-                        logger = logger)            
+#try:
+schedule = ess_scheduling.generate_schedule(
+                    lastProductionPrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['production_p_lt_DP_ID']), 
+                    lastConsumptionPrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['consumption_p_lt_DP_ID']), 
+                    lastNpSpotPricePrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['elering_nps_price_DP_ID']), 
+                    npSpotCurrentPrice = query_utils.get_last_reading_value(raw_data['params']['elering_nps_price_DP_ID']), 
+                    lastEss_e_lt = query_utils.get_last_prognosis_readings(raw_data['params']['ess_e_lt_DP_ID'], generate_if_missing=True), 
+                    ess_p = query_utils.get_last_reading_value(raw_data['params']['ess_p_DP_ID']) ,
+                    ess_charge = query_utils.get_last_reading_value(raw_data['params']['ess_charge_DP_ID']),
+                    ess_charge_end = query_utils.get_last_reading_value(raw_data['params']['ess_charge_end_DP_ID']),
+                    ess_soc = query_utils.get_last_reading_value(raw_data['params']['ess_avg_SOC_DP_ID']),
+                    ess_max_p = query_utils.get_last_reading_value(raw_data['params']['ess_max_p_DP_ID']),
+                    ess_max_e = query_utils.get_last_reading_value(raw_data['params']['ess_max_e_DP_ID']),
+                    ess_soc_min = raw_data['params']['ess_soc_min'], 
+                    ess_soc_max = raw_data['params']['ess_soc_max'],
+                    ess_safe_min = query_utils.get_last_reading_value(raw_data['params']['ess_min_batt_safe_lim_DP_ID'])*100,
+                    pccImportLimitW = query_utils.get_last_reading_value(raw_data['params']['pccImportLimitW_DP_ID']), #100000,
+                    pccExportLimitW = query_utils.get_last_reading_value(raw_data['params']['pccExportLimitW_DP_ID']), #-100000,
+                    startTime = datetime.now(),
+                    endTime = datetime.now() + timedelta(seconds=86400), # +24h
+                    interval = raw_data['params']['interval'], #900, #15min
+                    DAY_TARIFF = raw_data['params']['DAY_TARIFF'], #0.07,
+                    NIGHT_TARIFF = raw_data['params']['NIGHT_TARIFF'], #0.05,
+                    ESS_DEG_COST = raw_data['params']['ESS_DEG_COST'], #0.139,
+                    local_timezone = pytz.timezone(raw_data['params']['timezone']),
+                    logger = logger)            
 
-    if (len(schedule) == 0):
-        # Handle empty schedule case
-        logger.warning(f'Optimization failed - empty result. Prognosis not updated.')
-    else:
-        logger.info("ESS Schedule: "+", ".join(f"{dt} = {ess:.4g}" for dt, ess in zip(schedule["datetime"], schedule["ESS"])))
+if (len(schedule) == 0):
+    # Handle empty schedule case
+    logger.warning(f'Optimization failed - empty result. Prognosis not updated.')
+else:
+    logger.info("ESS Schedule: "+", ".join(f"{dt} = {ess:.4g}" for dt, ess in zip(schedule["datetime"], schedule["ESS"])))
 
-    # Prepare prognosis payload data based on generated schedule
-    essPowerPlan =[]
-    for _, row in schedule.iterrows():
-        dt = row['datetime']
-        utc_dt = dt.astimezone(timezone.utc) 
-        value = row['ESS'] 
-        essPowerPlan.append({
-            "time": utc_dt.isoformat().replace('+00:00', 'Z'),
-            "value": value
-        })
+# Prepare prognosis payload data based on generated schedule
+essPowerPlan =[]
+for _, row in schedule.iterrows():
+    dt = row['datetime']
+    utc_dt = dt.astimezone(timezone.utc) 
+    value = row['ESS'] 
+    essPowerPlan.append({
+        "time": utc_dt.isoformat().replace('+00:00', 'Z'),
+        "value": value
+    })
 
-    # Construct the prognosis payload with datapoint ID, timestamp, and payload data
-    prognosis_payload = {
-        "datapointId": query_utils.get_datapoint_ID(raw_data['params']['ess_e_lt_DP_ID']),
-        "time": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
-        "readings":essPowerPlan
-    }
+# Construct the prognosis payload with datapoint ID, timestamp, and payload data
+prognosis_payload = {
+    "datapointId": query_utils.get_datapoint_ID(raw_data['params']['ess_e_lt_DP_ID']),
+    "time": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+    "readings":essPowerPlan
+}
 
-    # POST datapoint prognosis
-    response = query_utils.post_datapoint_prognosis(prognosis_payload)
-    logger.info(f"Posted prognosis for datapoint {raw_data['params']['ess_e_lt_DP_ID']}; Response: {response}")
+# POST datapoint prognosis
+response = query_utils.post_datapoint_prognosis(prognosis_payload)
+logger.info(f"Posted prognosis for datapoint {raw_data['params']['ess_e_lt_DP_ID']}; Response: {response}")
     
-except Exception as e:
-    logger.error(f'Error generating ESS schedule: {e}')
+#except Exception as e:
+#    logger.error(f'Error generating ESS schedule: {e}')
 
 #######################################################################
 #### FINALIZATION
