@@ -57,8 +57,8 @@ try:
                         ess_soc_min = raw_data['params']['ess_soc_min'], 
                         ess_soc_max = raw_data['params']['ess_soc_max'],
                         ess_safe_min = query_utils.get_last_reading_value(raw_data['params']['ess_min_batt_safe_lim_DP_ID'])*100,
-                        pccImportLimitW = raw_data['params']['pccImportLimitW'], #100000,
-                        pccExportLimitW = raw_data['params']['pccExportLimitW'], #-100000,
+                        pccImportLimitW = query_utils.get_last_reading_value(raw_data['params']['pccImportLimitW_DP_ID']), #100000,
+                        pccExportLimitW = query_utils.get_last_reading_value(raw_data['params']['pccExportLimitW_DP_ID']), #-100000,
                         startTime = datetime.now(),
                         endTime = datetime.now() + timedelta(seconds=86400), # +24h
                         interval = raw_data['params']['interval'], #900, #15min
