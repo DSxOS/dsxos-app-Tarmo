@@ -10,7 +10,7 @@ def init(url, headers, logger=None):
     _query_headers = headers
     _logger = logger
     
-    logger.info(f"query_utils initialized with URL: {_query_url}")
+    logger.debug(f"query_utils initialized with URL: {_query_url}")
     
 # Helper to create Query object
 def Q():
@@ -115,7 +115,7 @@ def get_datapoint_prognosis(dp_identifier):
             .filter(Id__equals=last_prognosis_id)
             .get("/datapoint-prognoses")
         )
-        _logger.info(f"datapoint_prognosis: {datapoint_prognosis}")
+        _logger.debug(f"datapoint_prognosis: {datapoint_prognosis}")
         return datapoint_prognosis
     else:
         _logger.warning(f"No prognosis available for datapoint {dp_identifier}.")

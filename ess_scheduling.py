@@ -64,7 +64,7 @@ def generate_schedule(lastProductionPrognosis,
     npSpotPricePrognosis = npSpotPricePrognosis.sort_index()
 
     # Log parameters
-    logger.info(f'Scheduling initialised with following parameters:\n\
+    logger.debug(f'Scheduling initialised with following parameters:\n\
         ESS P = {ess_p/1000} kW\n\
         ESS available charge = {ess_charge/1000} kWh\n\
         ESS charge at end time = {ess_charge_end/1000} kWh\n\
@@ -305,14 +305,53 @@ def generate_schedule(lastProductionPrognosis,
 
     # Solver
     solver = SolverFactory('glpk', options={'tmlim': 300} , executable=r'/usr/bin/glpsol')
-    results = solver.solve(m, tee=True)
+    results = solver.solve(m, tee=False)
 
 
     if (results.solver.status == SolverStatus.ok) and ((results.solver.termination_condition == TerminationCondition.optimal) or (results.solver.termination_condition == TerminationCondition.feasible)):
         imp_kW = 0
         exp_kW = 0
         for i in m.PCC_EXPORT_kW:
-            print(f"PCC_EXPORT_kW[{i}] = {m.PCC_EXPORT_kW[i]()/1000:.2f}; PCC_IMPORT_kW[{i}] = {m.PCC_IMPORT_kW[i]()/1000:.2f}; P_kW[{i}] = {m.P_kW[i]/1000:.2f}; PV_kW[{i}] = {m.PV_kW[i]/1000:.2f};" +
+            # Power components (kW)
+            imp = m.PCC_IMPORT_kW[i]() / 1000
+            exp = m.PCC_EXPORT_kW[i]() / 1000
+            p   = m.P_kW[i] / 1000
+            pv  = m.PV_kW[i] / 1000
+
+            ess_c = m.ESS_kW_charge[i]() / 1000
+            ess_d = m.ESS_kW_discharge[i]() / 1000
+            ess   = m.ESS_kW[i]() / 1000
+            soc   = m.ESS_SoC[i]()
+
+            # Cost components
+            spot    = m.SPOT_EUR_kWh[i] / 1000
+            tariff  = m.TARIFF_EUR_kWh[i]
+            imp_cost  = imp   * kW_to_kWh * (spot + tariff)
+            exp_cost  = exp   * kW_to_kWh * spot
+            ess_cost  = ess_c * kW_to_kWh * ESS_DEG_COST
+            total_cost = imp_cost - exp_cost + ess_cost
+
+            logger.debug(
+                f"PCC_EXPORT_kW[{i}] = {exp:.2f}; "
+                f"PCC_IMPORT_kW[{i}] = {imp:.2f}; "
+                f"P_kW[{i}] = {p:.2f}; "
+                f"PV_kW[{i}] = {pv:.2f}; "
+                f"ESS_C_kW[{i}] = {ess_c:.2f}; "
+                f"ESS_D_kW[{i}] = {ess_d:.2f}; "
+                f"ESS_kW[{i}] = {ess:.2f}; "
+                f"ESS SOC[{i}] = {soc:.1f}; "
+                f"COST = IMP ({imp_cost:.3f}) - EXP ({exp_cost:.3f}) "
+                f"+ ESS ({ess_cost:.3f}) = {total_cost:.2f}"
+            )
+
+            imp_kW += m.PCC_IMPORT_kW[i]()
+            exp_kW += m.PCC_EXPORT_kW[i]()
+
+
+        '''
+        for i in m.PCC_EXPORT_kW:
+            
+            logger.debug(f"PCC_EXPORT_kW[{i}] = {m.PCC_EXPORT_kW[i]()/1000:.2f}; PCC_IMPORT_kW[{i}] = {m.PCC_IMPORT_kW[i]()/1000:.2f}; P_kW[{i}] = {m.P_kW[i]/1000:.2f}; PV_kW[{i}] = {m.PV_kW[i]/1000:.2f};" +
                 f" ESS_C_kW[{i}] = {m.ESS_kW_charge[i]()/1000:.2f}; ESS_D_kW[{i}] = {m.ESS_kW_discharge[i]()/1000:.2f}; ESS_kW[{i}] = {m.ESS_kW[i]()/1000:.2f};"+ 
                 f" ESS SOC[{i}] = {m.ESS_SoC[i]():.1f};"+
                 f" COST = IMP ({(m.PCC_IMPORT_kW[i]()/1000)*kW_to_kWh*(m.SPOT_EUR_kWh[i]/1000 + m.TARIFF_EUR_kWh[i]):.3f}) - EXP ({(m.PCC_EXPORT_kW[i]()/1000)*kW_to_kWh*m.SPOT_EUR_kWh[i]/1000:.3f}) + ESS ({(m.ESS_kW_charge[i]()/1000)*kW_to_kWh*ESS_DEG_COST:.3f})" +    
@@ -320,6 +359,7 @@ def generate_schedule(lastProductionPrognosis,
         
             imp_kW += m.PCC_IMPORT_kW[i]()
             exp_kW += m.PCC_EXPORT_kW[i]()
+        '''
 
         # Format results as data frame
         results_df = model_to_df(m)
@@ -331,6 +371,6 @@ def generate_schedule(lastProductionPrognosis,
         
         return results_df[["datetime", "ESS"]] 
     else:    
-        logger.info(results.write())
+        logger.debug(results.write())
 
         return None    

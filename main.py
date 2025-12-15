@@ -28,21 +28,21 @@ logger = setup_logger(
     log_file="query.log",
     loki_url="http://localhost:3100/loki/api/v1/push",  # Loki address
     loki_tags={"app_name": APP_NAME},        # add more tags if needed
-    #level=raw_data["logLevel"]
+    level=raw_data["logLevel"]    
 )
 
 # Initialize query_utils with URL + headers    
 query_utils.init(api_url, api_headers, logger)
 
 # Log passed arguments 
-logger.info(f"{APP_NAME} run with arguments: %s", raw_data)
+logger.debug(f"{APP_NAME} run with arguments: %s", raw_data)
 
 #######################################################################
 #### APPLICATION
 #######################################################################
 # Generate ESS schedule
 #try:
-logger.info(f"Last consumption prognosis: {query_utils.get_last_prognosis_readings(raw_data['params']['consumption_p_lt_DP_ID'])}")
+logger.debug(f"Last consumption prognosis: {query_utils.get_last_prognosis_readings(raw_data['params']['consumption_p_lt_DP_ID'])}")
 
 schedule = ess_scheduling.generate_schedule(
                     lastProductionPrognosis = query_utils.get_last_prognosis_readings(raw_data['params']['production_p_lt_DP_ID']), 
@@ -74,7 +74,7 @@ if (len(schedule) == 0):
     # Handle empty schedule case
     logger.warning(f'Optimization failed - empty result. Prognosis not updated.')
 else:
-    logger.info("ESS Schedule: "+", ".join(f"{dt} = {ess:.4g}" for dt, ess in zip(schedule["datetime"], schedule["ESS"])))
+    logger.debug("ESS Schedule: "+", ".join(f"{dt} = {ess:.4g}" for dt, ess in zip(schedule["datetime"], schedule["ESS"])))
 
 # Prepare prognosis payload data based on generated schedule
 essPowerPlan =[]
@@ -96,7 +96,7 @@ prognosis_payload = {
 
 # POST datapoint prognosis
 response = query_utils.post_datapoint_prognosis(prognosis_payload)
-logger.info(f"Posted prognosis for datapoint {raw_data['params']['ess_e_lt_DP_ID']}; Response: {response}")
+logger.debug(f"Posted prognosis for datapoint {raw_data['params']['ess_e_lt_DP_ID']}; Response: {response}")
     
 #except Exception as e:
 #    logger.error(f'Error generating ESS schedule: {e}')
@@ -104,4 +104,4 @@ logger.info(f"Posted prognosis for datapoint {raw_data['params']['ess_e_lt_DP_ID
 #######################################################################
 #### FINALIZATION
 #######################################################################
-logger.info("dsxos-app-test finished")
+logger.info(f"{APP_NAME} executed")
