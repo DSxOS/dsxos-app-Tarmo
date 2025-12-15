@@ -347,20 +347,6 @@ def generate_schedule(lastProductionPrognosis,
             imp_kW += m.PCC_IMPORT_kW[i]()
             exp_kW += m.PCC_EXPORT_kW[i]()
 
-
-        '''
-        for i in m.PCC_EXPORT_kW:
-            
-            logger.debug(f"PCC_EXPORT_kW[{i}] = {m.PCC_EXPORT_kW[i]()/1000:.2f}; PCC_IMPORT_kW[{i}] = {m.PCC_IMPORT_kW[i]()/1000:.2f}; P_kW[{i}] = {m.P_kW[i]/1000:.2f}; PV_kW[{i}] = {m.PV_kW[i]/1000:.2f};" +
-                f" ESS_C_kW[{i}] = {m.ESS_kW_charge[i]()/1000:.2f}; ESS_D_kW[{i}] = {m.ESS_kW_discharge[i]()/1000:.2f}; ESS_kW[{i}] = {m.ESS_kW[i]()/1000:.2f};"+ 
-                f" ESS SOC[{i}] = {m.ESS_SoC[i]():.1f};"+
-                f" COST = IMP ({(m.PCC_IMPORT_kW[i]()/1000)*kW_to_kWh*(m.SPOT_EUR_kWh[i]/1000 + m.TARIFF_EUR_kWh[i]):.3f}) - EXP ({(m.PCC_EXPORT_kW[i]()/1000)*kW_to_kWh*m.SPOT_EUR_kWh[i]/1000:.3f}) + ESS ({(m.ESS_kW_charge[i]()/1000)*kW_to_kWh*ESS_DEG_COST:.3f})" +    
-                f" = {(m.PCC_IMPORT_kW[i]()/1000)*kW_to_kWh*(m.SPOT_EUR_kWh[i]/1000 + m.TARIFF_EUR_kWh[i]) - (m.PCC_EXPORT_kW[i]()/1000)*kW_to_kWh*m.SPOT_EUR_kWh[i]/1000 + (m.ESS_kW_charge[i]()/1000)*kW_to_kWh*ESS_DEG_COST:.2f}")
-        
-            imp_kW += m.PCC_IMPORT_kW[i]()
-            exp_kW += m.PCC_EXPORT_kW[i]()
-        '''
-
         # Format results as data frame
         results_df = model_to_df(m)
         results_df["datetime"] = dataset.index
