@@ -48,7 +48,7 @@ class Query:
 
     def _request(self, method, endpoint, **kwargs):
         url = f"{self.base_url}{endpoint}"
-        
+        self.logger.debug(f"Request url: {url}")
         try:
             response = requests.request(
                 method,
