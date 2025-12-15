@@ -28,6 +28,7 @@ def get_datapoint(dp_identifier):
         .paginate(page=0, size=1)
         .get("/datapoints")
     )
+    _logger.debug("get_datapoint(%s) -> %s", dp_identifier, dp_data)
     return dp_data
 
 # GET datapoint ID
@@ -109,6 +110,7 @@ def get_last_prognosis_readings(dp_identifier, generate_if_missing=False):
 # GET datapoint's last datapoint prognosis
 def get_datapoint_prognosis(dp_identifier):
     last_prognosis_id = get_datapoint(dp_identifier)[0].get("lastPrognosisId")
+    _logger.debug("lastPrognosisId = %s", last_prognosis_id)
     if last_prognosis_id is not None:
         datapoint_prognosis = (
             Q()

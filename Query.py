@@ -58,6 +58,11 @@ class Query:
                 **kwargs
             )
             response.raise_for_status()
+            
+            self.logger.debug(
+                "HTTP %s %s -> %s %s",
+                method, response.url, response.status_code, response.text[:500]
+            )   
 
             if response.content:
                 return response.json()
