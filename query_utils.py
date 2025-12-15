@@ -98,6 +98,8 @@ def get_last_prognosis_readings(dp_identifier, generate_if_missing=False):
             .filter(datapointPrognosisId__equals=last_prognosis_id)
             .get("/prognosis-readings")
         )
+        if not last_prognosis_readings:
+            raise RuntimeError(f"No prognosis readings found for lastPrognosisId={last_prognosis_id}")
     else:              
         _logger.warning(f"No prognosis available for datapoint {dp_identifier}.")
         if generate_if_missing:
