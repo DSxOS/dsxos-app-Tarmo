@@ -15,7 +15,12 @@ def init(url, headers, logger=None):
 # Helper to create Query object
 def Q():
     return Query(_query_url, headers=_query_headers, logger=_logger)
-    
+
+def add_header(key, value):
+    global _query_headers
+    if _query_headers == None:
+        _query_headers = {}
+    _query_headers[key] = value
 ###########################################################
 # GET
 ###########################################################
@@ -128,6 +133,10 @@ def get_datapoint_prognosis(dp_identifier):
 ##########################################################        
 # POST
 ##########################################################
+def get_token(client_id, api_token):
+    token_data = Q()._request("POST", "/auth/token", data={ "grant_type":"client_credentials", "client_id":client_id, "client_secret":api_token })
+    return token_data["access_token"]
+
 # POST prognosis readings
 def post_prognosis_readings(prognosis_readings_payload):
     for reading in prognosis_readings_payload:
