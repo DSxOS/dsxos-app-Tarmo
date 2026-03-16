@@ -19,9 +19,19 @@ with open(args.config, "r") as f: # Open and read config-file
     raw_data = yaml.safe_load(f)
     
 # Extract API URL and Token
-api_url = raw_data['params']['apiEndpoint']
-api_token = raw_data['params']['token']
-api_headers = {"Authorization": api_token}
+api_url = raw_data["params"]["apiEndpoint"]
+api_token = raw_data["params"]["token"]
+client_id = raw_data["params"]["clientId"]
+
+#api_headers = {"Authorization": "Bearer " + token}
+api_headers = {}
+
+app_name = raw_data["appModule"]
+
+# Initialize query_utils with URL + headers
+query_utils.init(api_url, api_headers)
+jwt_token = query_utils.get_token(client_id, api_token)
+query_utils.add_header("Authorization", f"Bearer {jwt_token}")
 
 # Initialize logger with central logging to Loki
 logger = setup_logger(
@@ -30,9 +40,6 @@ logger = setup_logger(
     loki_tags={"app_name": APP_NAME},        # add more tags if needed
     level=raw_data["logLevel"]    
 )
-
-# Initialize query_utils with URL + headers    
-query_utils.init(api_url, api_headers, logger)
 
 # Log passed arguments 
 logger.debug(f"{APP_NAME} run with arguments: %s", raw_data)
