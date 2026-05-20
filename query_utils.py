@@ -82,24 +82,41 @@ def get_last_reading_value(dp_identifier):
 
 # General-purpose readings fetch with full retrieval mode support.
 #
-# retrieval_mode  | interval_seconds | Description
-# ----------------+------------------+----------------------------------------------
-# None / "FULL"   | not used         | All stored readings, no processing (default)
-# "DELTA"         | not used         | Only readings where the value changed; removes
-#                 |                  |   consecutive duplicates (good for denoising)
-# "CYCLIC"        | required         | One value per interval boundary; carries forward
-#                 |                  |   the last known value (step interpolation)
-# "INTERPOLATED"  | required         | One value per interval boundary; linearly
-#                 |                  |   interpolates between stored readings
-# "BEST_FIT"      | required         | Returns min and max reading per bucket with
-#                 |                  |   original timestamps (trend shape, fewer points)
-# "AVERAGE"       | required         | Time-weighted arithmetic mean per bucket
-# "MINIMUM"       | required         | Minimum stored value per bucket
-# "MAXIMUM"       | required         | Maximum stored value per bucket
-# "INTEGRAL"      | required         | Area under value-vs-time curve (unit × seconds);
-#                 |                  |   divide by 3600 to convert W×s → Wh
-# "SLOPE"         | required         | Rate of change per bucket (Δvalue/Δsecond);
-#                 |                  |   multiply by 3600 for Δvalue/hour
+# retrieval_mode    | interval_seconds | extra param      | Description
+# ------------------+------------------+------------------+------------------------------
+# None / "FULL"     | not used         |                  | All stored readings, no processing (default)
+# "DELTA"           | not used         |                  | Only readings where the value changed;
+#                   |                  |                  |   removes consecutive duplicates
+# "CYCLIC"          | required         |                  | One value per interval boundary;
+#                   |                  |                  |   carries forward the last known value
+# "INTERPOLATED"    | required         |                  | One value per interval boundary;
+#                   |                  |                  |   linearly interpolates between readings
+# "BEST_FIT"        | required         |                  | Min + max reading per bucket with original
+#                   |                  |                  |   timestamps (preserves trend shape)
+# "AVERAGE"         | required         |                  | Arithmetic mean of sample values per bucket
+# "MINIMUM"         | required         |                  | Minimum stored value per bucket
+# "MAXIMUM"         | required         |                  | Maximum stored value per bucket
+# "INTEGRAL"        | required         |                  | Area under value-vs-time curve (unit×seconds);
+#                   |                  |                  |   divide by 3600 to convert W×s → Wh
+# "SLOPE"           | required         |                  | Rate of change per bucket (Δvalue/Δsecond);
+#                   |                  |                  |   multiply by 3600 for Δvalue/hour
+# "COUNTER"         | required         | rollover_value   | Net cumulative delta per bucket; adds
+#                   |                  |                  |   rollover_value when a step is negative
+#                   |                  |                  |   (use for meters/pulse counters that wrap)
+# "VALUE_STATE"     | required         |                  | Time-weighted average per bucket using
+#                   |                  |                  |   step carry-forward interpolation;
+#                   |                  |                  |   unlike AVERAGE, weights by time at value
+# "ROUND_TRIP"      | not used         |                  | Seconds between consecutive rising edges
+#                   |                  |                  |   (low→high, threshold=0)
+# "EDGE_DETECTION"  | not used         | edge_type        | +1 at rising edges, -1 at falling edges
+#                   |                  | LEADING/TRAILING |   (threshold=0); filter by edge_type
+#                   |                  | /BOTH (default)  |
+# "PREDICTIVE"      | required         |                  | Simple Linear Regression fitted on stored
+#                   |                  |                  |   readings, evaluated at interval boundaries
+# "START_BOUND"     | required         |                  | Last stored value at or before each boundary
+#                   |                  |                  |   (look-back snapshot)
+# "END_BOUND"       | required         |                  | First stored value after each boundary
+#                   |                  |                  |   (look-ahead snapshot)
 #
 # Time params: ISO-8601 strings, e.g. "2026-05-20T00:00:00Z"
 # Returns a list of {"id", "time", "value", "datapointId"} dicts, or [] on error.
