@@ -1,3 +1,4 @@
+import logging
 import requests
 
 class Query:
@@ -6,7 +7,7 @@ class Query:
         self.headers = headers or {}
         self.params = {}
         self.timeout = timeout
-        self.logger = logger 
+        self.logger = logger or logging.getLogger(__name__)
 
     def post(self, endpoint, data=None, json=None):
         return self._request("POST", endpoint, data=data, json=json)
